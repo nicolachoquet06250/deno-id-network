@@ -1,0 +1,68 @@
+import { CustomRouter, HttpMethod } from "../http/Router.ts";
+
+export function getParams(func: Function) {
+	const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+	const ARGUMENT_NAMES = /([^\s,]+)/g;
+
+	let fnStr = func.toString().replace(STRIP_COMMENTS, '');
+	let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+	if(result === null) result = [];
+	return result;
+}
+
+/*******************************************************************************/
+/* Paramétrage du type de classe ***********************************************/
+/*******************************************************************************/
+
+export const Controller = (route: string = '', type: any = null) =>
+	(target: any) => {
+		CustomRouter._groupUrls[(type ? type.name : target.name)] = route;
+	};
+
+/*******************************************************************************/
+/* Paramétrage de la méthode http **********************************************/
+/*******************************************************************************/
+
+export const Get = (route: string = '/', name?: string) =>
+	(target: {} | any, propertyKey: PropertyKey) => {
+		CustomRouter._routes.push({
+			httpMethod: HttpMethod.GET,
+			route: route,
+			callback: propertyKey,
+			target,
+			name
+		});
+	};
+
+export const Post = (route: string = '/', name?: string) =>
+	(target: {} | any, propertyKey: PropertyKey) => {
+		CustomRouter._routes.push({
+			httpMethod: HttpMethod.POST,
+			route: route,
+			callback: propertyKey,
+			target,
+			name
+		});
+	};
+
+export const Delete = (route: string = '/', name?: string) =>
+	(target: {} | any, propertyKey: PropertyKey) => {
+		CustomRouter._routes.push({
+			httpMethod: HttpMethod.DELETE,
+			route: route,
+			callback: propertyKey,
+			target,
+			name
+		});
+	};
+
+export const Put = (route: string = '/', name?: string) =>
+	(target: {} | any, propertyKey: PropertyKey) => {
+		CustomRouter._routes.push({
+			httpMethod: HttpMethod.PUT,
+			route: route,
+			callback: propertyKey,
+			target,
+			name
+		});
+	};
