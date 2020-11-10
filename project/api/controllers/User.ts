@@ -4,7 +4,7 @@ import { CustomRouter } from "../../lib/http/Router.ts";
 import { ConstructorInjection, InjectedProperty, InjectedParameter } from "../../lib/decorators/dis.ts";
 
 @ConstructorInjection()
-@Controller('/user', User)
+@Controller('/user')
 export class User {
 	@InjectedProperty({
 		type: CustomRouter

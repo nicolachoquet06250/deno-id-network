@@ -14,9 +14,9 @@ export function getParams(func: Function) {
 /* Paramétrage du type de classe ***********************************************/
 /*******************************************************************************/
 
-export const Controller = (route: string = '', type: any = null) =>
+export const Controller = (route: string = '') =>
 	(target: any) => {
-		CustomRouter._groupUrls[(type ? type.name : target.name)] = route;
+		CustomRouter._groupUrls[target.name] = route;
 	};
 
 /*******************************************************************************/

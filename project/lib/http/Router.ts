@@ -84,7 +84,6 @@ export class CustomRouter {
 					const target = route.target.constructor;
 					const callback = route.callback;
 					const ctx = DependencyInjection.instantiateType(target);
-					// console.log(2, target.name, ctx)
 					await ctx[callback](context);
 				});
 			}
