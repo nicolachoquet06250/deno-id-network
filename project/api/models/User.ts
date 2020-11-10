@@ -13,7 +13,6 @@ export class User {
 		auto_increment: true,
 		nullable: false
 	})
-	@Watch()
 	public id?: number;
 
 	@Field({
@@ -36,6 +35,5 @@ export class User {
 		type: 'timestamp',
 		default: 'current_timestamp'
 	})
-	@Watch()
 	public created_at?: Date;
 }
