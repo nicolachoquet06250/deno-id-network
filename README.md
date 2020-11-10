@@ -1,15 +1,15 @@
-###DENO NETWORK ID
+# DENO NETWORK ID
 
-####GET STARED
+## GET STARED
 
- - PREREQUIS
-     1. avoir installé DENO
-     2. un serveur mysql
-     3. un client mysql
-     4. un terminal
+ - ### PREREQUIS
+     - avoir installé DENO
+     - un serveur mysql
+     - un client mysql
+     - un terminal
     
-
- - SANS DOCKER
+ - ### INSTALLATION
+   - #### SANS DOCKER
      1. Générer un fichier .env
        
             deno run --allow-read --allow-write ./project/cmd.ts env ENV_VAR1=ENV_VALUE1 ...
@@ -20,16 +20,16 @@
         
             deno run --allow-env --allow-net --allow-read ./project/main.ts
     
- - AVEC DOCKER
-   - sur linux/mac
+   - #### AVEC DOCKER
+     - sur linux/mac
 
-         sh docker-build.sh <comtainer-name>
-   - sur windows
+           sh docker-build.sh <comtainer-name>
+     - sur windows
      
-         docker-compose build
-         docker-compose up <container-name>
+           docker-compose build
+           docker-compose up <container-name>
 
-####ANNEXES
+## ANNEXES
 
 - [DENO](https://deno.land/)
     - [mysql connector](https://deno.land/x/mysql@v2.6.0)
