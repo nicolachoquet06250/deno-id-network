@@ -4,6 +4,20 @@ import { getAllRoutes } from "./api/mod.ts";
 
 class Main {
 	static async run() {
+		// @ts-ignore
+		const { IP, PORT } = Deno.env.toObject();
+		
+		let objectToListen = {
+			port: 8000,
+			hostname: '127.0.0.1'
+		};
+		if (PORT) {
+			objectToListen.port = parseInt(PORT);
+		}
+		if (IP) {
+			objectToListen.hostname = IP;
+		}
+
 		getAllRoutes();
 
 		const app = new Application();
@@ -13,7 +27,7 @@ class Main {
 		app.use(router.allowedMethods());
 
 		console.log('server is starting')
-		await app.listen({ port: 8000 });
+		await app.listen(objectToListen);
 	}
 }
 
