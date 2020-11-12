@@ -1,5 +1,6 @@
 import { Router } from "https://deno.land/x/oak/mod.ts";
 import { DependencyInjection } from "../dis/DependencyInjection.ts";
+import { upload } from "../middlewares/upload/mod.ts";
 
 export enum HttpMethod {
 	GET = 'get',
@@ -37,10 +38,16 @@ export class CustomRouter {
 	}
 
 	public post(route: string, callback: any, uploadDirectory?: string) {
+		if (uploadDirectory) {
+			return CustomRouter.instance.post(route, upload(uploadDirectory), callback);
+		}
 		return CustomRouter.instance.post(route, callback);
 	}
 
 	public put(route: string, callback: any, uploadDirectory?: string) {
+		if (uploadDirectory) {
+			return CustomRouter.instance.put(route, upload(uploadDirectory), callback);
+		}
 		return CustomRouter.instance.put(route, callback);
 	}
 
@@ -53,19 +60,13 @@ export class CustomRouter {
 			let httpMethod: string;
 			switch (route.httpMethod) {
 				case HttpMethod.GET:
-					httpMethod = 'get';
-					break;
 				case HttpMethod.POST:
-					httpMethod = 'post';
-					break;
 				case HttpMethod.PUT:
-					httpMethod = 'put';
-					break;
 				case HttpMethod.DELETE:
-					httpMethod = 'delete';
+					httpMethod = route.httpMethod;
 					break;
 				default:
-					httpMethod = 'get';
+					httpMethod = HttpMethod.GET;
 					break;
 			}
 			let methodToCall: Function;

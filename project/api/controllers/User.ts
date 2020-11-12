@@ -142,4 +142,10 @@ export class User {
 			}
 		}
 	}
+
+	@Upload('project/uploads')
+	@Post('/toto/up')
+	public async upload(ctx: any) {
+		ctx.response.body = {};
+	}
 }
