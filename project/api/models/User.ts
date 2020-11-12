@@ -1,12 +1,8 @@
 import { Field, Key, Model, Watch } from "../../lib/decorators/db.ts";
 
-@Model({
-	table: 'user'
-})
+@Model({ table: 'user' })
 export class User {
-	@Key({
-		primary: true
-	})
+	@Key({ primary: true })
 	@Field({
 		name: 'id',
 		type: 'int',

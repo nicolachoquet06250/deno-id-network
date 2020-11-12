@@ -1,35 +1,13 @@
-import { Controller, Get, Post, Put, Delete } from "../../lib/decorators/http.ts";
+import { Controller, Get } from "../../lib/decorators/http.ts";
 
-@Controller('/home')
+@Controller()
 export class Home {
-	@Get('/test')
+
 	@Get()
+	@Get('/home')
+	@Get('/home/test')
 	public async get(context: any) {
 		context.response.body = {
-			page: 'home'
-		}
-	}
-
-	// @Post()
-	public post(context: any) {
-		context.response.body = {
-			http: 'post',
-			page: 'home'
-		}
-	}
-
-	// @Put()
-	public put(context: any) {
-		context.response.body = {
-			http: 'put',
-			page: 'home'
-		}
-	}
-
-	// @Delete()
-	public delete(context: any) {
-		context.response.body = {
-			http: 'delete',
 			page: 'home'
 		}
 	}

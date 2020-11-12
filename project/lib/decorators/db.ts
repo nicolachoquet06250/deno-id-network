@@ -40,7 +40,7 @@ type InsertResult = {
 interface IModelBase {}
 
 export interface IModel {
-	save(): Promise<boolean|void>;
+	save(): Promise<IModelBase|void>;
 	remove(): Promise<boolean|void>;
 	toString(): string;
 }
@@ -97,11 +97,11 @@ export function Model(conf: ModelConfig) {
 				return obj instanceof Array ? obj[0] : obj;
 			}
 
-			public async save(): Promise<boolean|void> {
-				if (Database.models_states[constructor.name].changes.length > 0) {
+			public async save(): Promise<IModelBase|void> {
+				if (Object.keys(Database.models_states[constructor.name].changes).length > 0) {
 					const client = await Database.connection;
 
-					const result = await client.execute(`UPDATE \\\`${Database.tables_name[constructor.name].table}\\\` SET ${(() => {
+					const result = await client.execute(`UPDATE \`${Database.tables_name[constructor.name].table}\` SET ${(() => {
 						let tmp = [];
 						for (let prop of Object.keys(Database.models_states[constructor.name].changes)) {
 							tmp.push(prop + ' = ' +
@@ -117,11 +117,11 @@ export function Model(conf: ModelConfig) {
 
 					if (result.affectedRows && result.affectedRows > 0) {
 						Database.models_states[constructor.name].changes = {};
-						return true;
+						return this;
 					}
 					throw Error('sql update query error');
 				}
-				return true;
+				return this;
 			}
 
 			public static async from(config: Record<string, any>): Promise<Array<Model>|Model|boolean> {
@@ -216,6 +216,33 @@ export const Field = (conf: FieldConfig) =>
 		}
 
 		Database.tables[table_name][name.toString()] = { ...Database.tables[table_name][name.toString()], ...conf };
+
+		Object.defineProperty(target.constructor.prototype, name.toString(), {
+			set(value: any) {
+				const target_name = target.constructor.name;
+
+				name = name.toString();
+
+				if (!this[`_${name}`]) {
+					if (!Database.models_states[target_name]) {
+						Database.models_states[target_name] = { initialized: {}, changes: {} };
+					}
+
+					Database.models_states[target_name].initialized[name] = value;
+				}
+
+				if (this[`_${name}`] && this[`_${name}`] !== value) {
+					Database.models_states[target_name].initialized[name] = value;
+					Database.models_states[target_name].changes[name] = value;
+				}
+
+				this[`_${name}`] = value;
+			},
+			get() {
+				name = name.toString()/*.substr(1, name.toString().length - 1)*/;
+				return this[`_${name}`];
+			}
+		})
 	};
 
 export const Key = (conf: Record<string, string|boolean|any> = {}) =>
@@ -235,33 +262,22 @@ export const Key = (conf: Record<string, string|boolean|any> = {}) =>
 
 export const Watch = (conf: WatchConfig = {}) =>
 	(target: {} | any, name: PropertyKey) => {
-		Object.defineProperty(target.constructor.prototype, name.toString(), {
+		Object.defineProperty(target.constructor.prototype, '_' + name.toString(), {
 			set(value: any) {
-				const target_name = target.constructor.name;
-
-				if (!this[`_${name.toString()}`] && conf.on_initialized) {
+				if (!this[`__${name.toString()}`] && conf.on_initialized) {
 					const on_initialized: Function = conf.on_initialized.bind(this)
 					on_initialized(value, this);
-
-					if (!Database.models_states[target_name]) {
-						Database.models_states[target_name] = { initialized: {}, changes: {} };
-					}
-
-					Database.models_states[target_name].initialized[name.toString()] = value;
 				}
 
-				if (this[`_${name.toString()}`] && this[`_${name.toString()}`] !== value && conf.on_changed) {
+				if (this[`__${name.toString()}`] && this[`__${name.toString()}`] !== value && conf.on_changed) {
 					const on_changed: Function = conf.on_changed.bind(this)
-					on_changed(value, this[`_${name.toString()}`], this);
-
-					Database.models_states[target_name].initialized[name.toString()] = value;
-					Database.models_states[target_name].changes[name.toString()] = value;
+					on_changed(value, this[`__${name.toString()}`], this);
 				}
 
-				this[`_${name.toString()}`] = value;
+				this['__' + name.toString()] = value;
 			},
 			get() {
-				return this[`_${name.toString()}`];
+				return this[`__${name.toString()}`];
 			}
 		})
 	};
