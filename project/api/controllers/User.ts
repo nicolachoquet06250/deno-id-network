@@ -1,3 +1,5 @@
+import "https://deno.land/x/dotenv/load.ts";
+
 import { Controller, Get } from "../../lib/decorators/http.ts";
 import { User as UserModel } from "../../api/models/User.ts";
 import { CustomRouter } from "../../lib/http/Router.ts";
@@ -20,6 +22,9 @@ export class User {
 
 	@Get('/:id', 'user')
 	public async get(context: any) {
+		// @ts-ignore
+		const { DOMAIN } = Deno.env.toObject();
+
 		if (context.params && context.params.id) {
 			// @ts-ignore
 			const user: UserModel|boolean = await UserModel.from({
@@ -27,7 +32,7 @@ export class User {
 			});
 
 			if (user) {
-				const url = this.test ? context.request.url.origin + this.test.url('user', { id: parseInt(context.params.id) + 1 }) : '';
+				const url = this.test ? (DOMAIN ? DOMAIN : context.request.url.origin) + this.test.url('user', { id: parseInt(context.params.id) + 1 }) : '';
 				context.response.body = { user, next_user_id: url };
 			} else {
 				context.response.status = 404;

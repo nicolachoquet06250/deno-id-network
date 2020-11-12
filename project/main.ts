@@ -7,7 +7,7 @@ import { getAllRoutes } from "./api/mod.ts";
 class Main {
 	static async run() {
 		// @ts-ignore
-		const { IP, PORT } = Deno.env.toObject();
+		const { IP, PORT, DOMAIN } = Deno.env.toObject();
 		
 		let objectToListen = {
 			port: 8000,
@@ -28,7 +28,7 @@ class Main {
 		app.use(router.routes());
 		app.use(router.allowedMethods());
 
-		console.log('server is starting')
+		console.log(`server is starting on ${DOMAIN ? DOMAIN : 'http://' + objectToListen.hostname}${objectToListen.port === 80 ? '' : ':' + objectToListen.port}`)
 		await app.listen(objectToListen);
 	}
 }
