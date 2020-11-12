@@ -1,3 +1,5 @@
+import "https://deno.land/x/dotenv/load.ts";
+
 import { CustomRouter as Router } from "./lib/http/Router.ts";
 import { Application } from "https://deno.land/x/oak/mod.ts";
 import { getAllRoutes } from "./api/mod.ts";
