@@ -1,5 +1,5 @@
 import { Router } from "https://deno.land/x/oak/mod.ts";
-import {DependencyInjection} from "../dis/DependencyInjection.ts";
+import { DependencyInjection } from "../dis/DependencyInjection.ts";
 
 export enum HttpMethod {
 	GET = 'get',
@@ -13,7 +13,8 @@ export interface Route {
 	route: string
 	callback: Function | any,
 	target: any,
-	name?: string
+	name?: string,
+	upload?: string
 }
 
 export class CustomRouter {
@@ -35,11 +36,11 @@ export class CustomRouter {
 		return CustomRouter.instance.get(route, callback);
 	}
 
-	public post(route: string, callback: any) {
+	public post(route: string, callback: any, uploadDirectory?: string) {
 		return CustomRouter.instance.post(route, callback);
 	}
 
-	public put(route: string, callback: any) {
+	public put(route: string, callback: any, uploadDirectory?: string) {
 		return CustomRouter.instance.put(route, callback);
 	}
 
@@ -77,7 +78,7 @@ export class CustomRouter {
 				const callback = route.callback;
 				const ctx = DependencyInjection.instantiateType(target);
 				await ctx[callback](context);
-			});
+			}, route.upload);
 			if (route.route === '/' && CustomRouter._groupUrls[route.target.constructor.name] !== '') {
 				// @ts-ignore
 				methodToCall(CustomRouter._groupUrls[route.target.constructor.name], async (context: any) => {
@@ -85,7 +86,7 @@ export class CustomRouter {
 					const callback = route.callback;
 					const ctx = DependencyInjection.instantiateType(target);
 					await ctx[callback](context);
-				});
+				}, route.upload);
 			}
 			if (route.name) {
 				CustomRouter.routeNames[route.name] = {

@@ -195,6 +195,15 @@ export function Model(conf: ModelConfig) {
 						.join(', ')
 				})()} }`;
 			}
+
+			toJson(): Record<string, any> {
+				let model: Record<string, any> = {};
+				for (let key of CustomObject.keys(Database.tables[constructor.name])) {
+					// @ts-ignore
+					model[key] = this[key];
+				}
+				return model;
+			}
 		}
 	}
 }

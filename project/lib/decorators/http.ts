@@ -66,3 +66,17 @@ export const Put = (route: string = '/', name?: string) =>
 			name
 		});
 	};
+
+/*******************************************************************************/
+/* Gestion de l'upload *********************************************************/
+/*******************************************************************************/
+
+export const Upload = (directory: string) =>
+	(target: {} | any, propertyKey: PropertyKey) => {
+		for (let route of CustomRouter._routes) {
+			if (route.callback === propertyKey) {
+				route.upload = directory;
+				break;
+			}
+		}
+	};

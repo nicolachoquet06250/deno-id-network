@@ -1,6 +1,6 @@
 import "https://deno.land/x/dotenv/load.ts";
 
-import { Controller, Delete, Get, Post, Put } from "../../lib/decorators/http.ts";
+import { Controller, Delete, Get, Post, Put, Upload } from "../../lib/decorators/http.ts";
 import { User as UserModel } from "../../api/models/User.ts";
 import { CustomObject } from "../../lib/decorators/db.ts";
 import { CustomRouter } from "../../lib/http/Router.ts";
@@ -9,15 +9,11 @@ import { ConstructorInjection, InjectedProperty, InjectedParameter } from "../..
 @ConstructorInjection()
 @Controller('/user')
 export class User {
-	@InjectedProperty({
-		type: CustomRouter
-	})
+	@InjectedProperty({ type: CustomRouter })
 	public router?: CustomRouter;
 
 	constructor(
-		@InjectedParameter({
-			type: CustomRouter
-		})
+		@InjectedParameter({ type: CustomRouter })
 		private test: CustomRouter
 	) {}
 
@@ -34,7 +30,8 @@ export class User {
 
 			if (user) {
 				const url = this.test ? (DOMAIN ? DOMAIN : context.request.url.origin) + this.test.url('user', { id: parseInt(context.params.id) + 1 }) : '';
-				context.response.body = { user, next_user_id: url };
+				// @ts-ignore
+				context.response.body = { user: user.toJson(), next_user_id: url };
 			} else {
 				context.response.status = 404;
 				context.response.body = {
@@ -56,7 +53,9 @@ export class User {
 	@Get('s', 'users')
 	public async getAll(context: any) {
 		// @ts-ignore
-		context.response.body = await UserModel.getAll();
+		context.response.body = (await UserModel.getAll())
+			// @ts-ignore
+			.map((u: UserModel) => u.toJson());
 	}
 
 	@Post('', 'add_user')
@@ -71,7 +70,8 @@ export class User {
 		// @ts-ignore
 		const user: UserModel = await UserModel.create(...CustomObject.values(body));
 		if (user) {
-			context.response.body = user;
+			// @ts-ignore
+			context.response.body = user.toJson();
 		} else {
 			context.response.status = 500;
 			context.response.body = {
@@ -100,7 +100,8 @@ export class User {
 				user.save();
 			}
 
-			context.response.body = user;
+			// @ts-ignore
+			context.response.body = user.toJson();
 		}
 	}
 
