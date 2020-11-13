@@ -13,18 +13,18 @@ export class Image {
 	@Get('/uploads/:name.:ext', 'uploaded_images')
 	public async get_uploaded_images() {
 		if (this.context) {
-			if (this.context.params && this.context.has_param('name') && this.context.has_param('ext')) {
+			if (this.context.has_param('name') && this.context.has_param('ext')) {
 				// @ts-ignore
-				const image_path = `${Deno.cwd()}/project/uploads/${this.context.params.name}.${this.context.params.ext}`;
+				const image_path = `${Deno.cwd()}/project/uploads/${this.context.param('name')}.${this.context.param('ext')}`;
 
 				if (await exists(image_path)) {
-					this.context.init_headers({'content-type': 'image/png'});
-					// @ts-ignore
-					this.context.respond(await Deno.readFile(image_path));
+					this.context.init_headers({'content-type': `image/${this.context.param('ext')}`})
+						// @ts-ignore
+						.respond(await Deno.readFile(image_path));
 				} else {
 					if (this.router) {
 						// @ts-ignore
-						const {DOMAIN} = Deno.env.toObject();
+						const { DOMAIN } = Deno.env.toObject();
 
 						this.context.set_status(404).respond({
 							status: 'error',

@@ -32,6 +32,9 @@ export class DependencyInjection {
 	}
 
 	static getParameters(className: string, method: string): Record<number, { object: Function, key: string }> {
+		if (!this.methodParameters[className]) {
+			return {};
+		}
 		return this.methodParameters[className][method];
 	}
 
@@ -54,12 +57,12 @@ export class DependencyInjection {
 		}
 	}
 
-	static instantiateType(type: Function) {
+	static instantiateType(type: Function, ...params: any[]) {
 		if ("create" in type) {
 			// @ts-ignore
-			return type.create();
+			return type.create(...params);
 		}
 		// @ts-ignore
-		return new type();
+		return new type(...params);
 	}
 }

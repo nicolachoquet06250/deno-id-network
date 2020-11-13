@@ -73,33 +73,46 @@ export class CustomRouter {
 			let methodToCall: Function;
 			eval(`methodToCall = this.${httpMethod};`);
 
-			// console.log(route)
 			// @ts-ignore
-			methodToCall(CustomRouter._groupUrls[route.target.constructor.name] + route.route, async (context: any) => {
+			methodToCall(CustomRouter._groupUrls[route.target.constructor.name] + route.route, async (context: any, next: Function) => {
 				const target = route.target.constructor;
 				const callback = route.callback;
 
-				Context.create(context);
+				const _context = DependencyInjection.instantiateType(Context, context, next);
 
-				const ctx = DependencyInjection.instantiateType(target);
-				await ctx[callback](Context.create());
+				try {
+					const ctx = DependencyInjection.instantiateType(target);
+					await ctx[callback](_context);
+				} catch (e) {
+					_context.set_status(500).respond({
+						status: 'error',
+						code: 500,
+						message: e.message
+					})
+				}
 
-				Context.reset();
 			}, route.upload);
 			if (route.route === '/' && CustomRouter._groupUrls[route.target.constructor.name] !== '') {
 				// @ts-ignore
-				methodToCall(CustomRouter._groupUrls[route.target.constructor.name], async (context: any) => {
+				methodToCall(CustomRouter._groupUrls[route.target.constructor.name], async (context: any, next: Function) => {
 					const target = route.target.constructor;
 					const callback = route.callback;
 
-					Context.create(context);
+					const _context = DependencyInjection.instantiateType(Context, context, next);
 
-					const ctx = DependencyInjection.instantiateType(target);
-					await ctx[callback](Context.create());
-
-					Context.reset();
+					try {
+						const ctx = DependencyInjection.instantiateType(target);
+						await ctx[callback](_context);
+					} catch (e) {
+						_context.set_status(500).respond({
+							status: 'error',
+							code: 500,
+							message: e.message
+						})
+					}
 				}, route.upload);
 			}
+
 			if (route.name) {
 				CustomRouter.routeNames[route.name] = {
 					route: `${CustomRouter._groupUrls[route.target.constructor.name]}${route.route}`,

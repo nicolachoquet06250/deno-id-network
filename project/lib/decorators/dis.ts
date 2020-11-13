@@ -19,9 +19,7 @@ export function InjectedProperty(conf: { type: any }) {
 	return function (target: {} | any, key: string) {
 		Object.defineProperty(target, key, {
 			get() {
-				if (!this[`_${key}`]) {
-					this[`_${key}`] = new (conf.type)();
-				}
+				if (!this[`_${key}`]) this[`_${key}`] = DependencyInjection.instantiateType(conf.type);
 				return this[`_${key}`];
 			}
 		});

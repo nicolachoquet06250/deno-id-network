@@ -16,8 +16,5 @@ export class Home {
 				page: 'home'
 			});
 		}
-		// context.response.body = {
-		// 	page: 'home'
-		// }
 	}
 }

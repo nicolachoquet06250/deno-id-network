@@ -2,32 +2,30 @@ export class Context {
 	private headers?: Headers;
 	private status?: number;
 	private next?: Function;
+	private ctx?: any;
 
-	private static instance?: Context;
+	private static next?: Function;
+	private static ctx?: any;
 
-	public static create(ctx?: any): Context {
-		if (!this.instance) {
-			this.instance = new Context(ctx);
+	public static create(ctx?: any, next?: Function): Context {
+		if (ctx !== undefined) {
+			this.ctx = ctx;
 		}
-		return this.instance;
+		if (next !== undefined) {
+			this.next = next;
+		}
+		return new Context(this.ctx, this.next);
 	}
 
-	public static reset() {
-		this.instance = undefined;
-	}
-
-	private constructor(private ctx: any) {
-		this.ctx = ctx;
-	}
-
-	public set_next(next: Function) {
+	private constructor(context?: any, next?: Function) {
+		this.ctx = context;
 		this.next = next;
 	}
 
-	public respond(body: any, headers: Headers = new Headers(), status: number = 200) {
-		this.status = this.status ?? status;
-		this.headers = this.headers ?? headers;
-		this.ctx.response = { status: this.status, headers: this.headers, body };
+	public respond(body: any, headers: Headers = new Headers(), status: number = 200): void {
+		this.ctx.response.status = this.status ?? status;
+		this.ctx.response.headers = this.headers ?? headers;
+		this.ctx.response.body = body;
 
 		if (this.next) {
 			const next = this.next;
@@ -53,19 +51,19 @@ export class Context {
 		return this;
 	}
 
-	public has_param(key: string) {
+	public has_param(key: string): boolean {
 		return Object.keys(this.ctx.params).indexOf(key) !== -1;
 	}
 
-	public params() {
+	public params(): Record<string, string> {
 		return this.ctx.params;
 	}
 
-	public param(key: string) {
+	public param(key: string): string {
 		return this.ctx.params[key];
 	}
 
-	public request() {
+	public request(): any {
 		return this.ctx.request;
 	}
 

@@ -2,13 +2,12 @@ import "https://deno.land/x/dotenv/load.ts";
 
 import {
 	Controller, Delete, Get, Post, Put, Upload,
-	ConstructorInjection, InjectedProperty, InjectedParameter,
+	InjectedProperty,
 	CustomObject
 } from "../../lib/decorators/mod.ts";
 import { User as UserModel } from "../../api/models/mod.ts";
 import { Context, CustomRouter } from "../../lib/http/mod.ts";
 
-@ConstructorInjection()
 @Controller('/user')
 export class User {
 	@InjectedProperty({ type: CustomRouter })
@@ -16,11 +15,6 @@ export class User {
 
 	@InjectedProperty({ type: Context })
 	private context?: Context;
-
-	constructor(
-		@InjectedParameter({ type: CustomRouter })
-		private test: CustomRouter
-	) {}
 
 	@Get('/:id', 'user')
 	public async get() {
@@ -35,7 +29,7 @@ export class User {
 				});
 
 				if (user) {
-					const url = this.test ? (DOMAIN ? DOMAIN : this.context.request().url.origin) + this.test.url('user', {
+					const url = this.router ? (DOMAIN ? DOMAIN : this.context.request().url.origin) + this.router.url('user', {
 						id: parseInt(this.context.param('id')) + 1
 					}) : '';
 					// @ts-ignore
@@ -76,7 +70,6 @@ export class User {
 				body.created_at = new Date();
 			}
 
-			console.log(body);
 			// @ts-ignore
 			const user: UserModel = await UserModel.create(...CustomObject.values(body));
 			if (user) {
