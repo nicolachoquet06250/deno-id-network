@@ -12,13 +12,13 @@
    - #### SANS DOCKER
      1. Générer un fichier .env
        
-            deno run --allow-read --allow-write ./project/cmd.ts env ENV_VAR1=ENV_VALUE1 ...
+            deno run --allow-read --allow-write --unstable ./project/cmd.ts make:env {\"ENV_VAR1\":\"ENV_VALUE1\", ...}
      2. Migrer la base de donnés
     
-            deno run --allow-env --allow-net ./project/cmd.ts migrate
+            deno run --allow-env --allow-net --unstable ./project/cmd.ts db:migrate
      3. Lancer le serveur
         
-            deno run --allow-env --allow-net --allow-read ./project/main.ts
+            deno run --allow-env --allow-net --allow-read --unstable ./project/main.ts
     
    - #### AVEC DOCKER
      - sur linux/mac
@@ -32,8 +32,12 @@
 ## ANNEXES
 
 - [DENO](https://deno.land/)
-    - [mysql connector](https://deno.land/x/mysql@v2.6.0)
-    - [oak backend framework](https://deno.land/x/oak@v6.3.1)
-    - [webview](https://deno.land/x/webview@0.4.7)
-    - [tutorials](https://denotutorials.net)
+    - [Mysql connector](https://deno.land/x/mysql@v2.6.0)
+    - [Oak backend framework](https://deno.land/x/oak@v6.3.1)
+    - [Webview](https://deno.land/x/webview@0.4.7)
+    - [Tutorials](https://denotutorials.net)
+    - [Portage de commander.js](https://deno.land/x/cmd@v1.2.0)
+    - [Librairie pour ajouter de la couleurs à ses messages console](https://deno.land/std@0.74.0/fmt/colors.ts)
 - [TypeScript Decorators](https://www.typescriptlang.org/docs/handbook/decorators.html)
+<br />
+<br />
