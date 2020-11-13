@@ -1,41 +1,51 @@
+import { Command } from 'https://cdn.depjs.com/cmd/mod.ts';
+import { red, yellow, green, bold } from "https://deno.land/std@0.74.0/fmt/colors.ts";
+import { exists } from "https://deno.land/std@0.61.0/fs/mod.ts";
 import { Database } from "./lib/database/Database.ts";
 
-function Make(func: string, ...args: string[]) {
-	// @ts-ignore
-	if (func in this) {
-		// @ts-ignore
-		this[func](...args);
-		return;
-	}
-	throw Error(`make.${func} not found`);
-}
+const program = new Command('network-id');
 
-Make.prototype.env = function (...args: string[]) {
-	let file_content = '';
+program.version('1.0.0')
 
-	for (let line of args) {
-		file_content += `${line}\n`;
-	}
+program
+	.option('-c, --config <FILE>', 'load configuration file')
+	.option('-v, --verbose', 'enable verbose mode')
 
-	// @ts-ignore
-	Deno.writeTextFileSync('.env', file_content);
-}
+program.command('make:env <json>')
+	.description('generate .env file with json keys and values')
+	.action(async (param: string) => {
+		try {
+			const json: Record<string, string> = JSON.parse(param);
 
-Make.prototype.migrate = async function (...args: string[]) {
-	try {
-		await Database.migrate();
-		console.log('migration successful !')
-	} catch (e) {
-		console.error(e);
-	}
-}
+			let file_content = '';
 
-try {
-	// @ts-ignore
-	let args = [...Deno.args];
-	const func = args.shift();
-	// @ts-ignore
-	new Make(func, ...args);
-} catch (e) {
-	console.error(`ERROR : ${e.message}`);
-}
+			for (let key of Object.keys(json)) {
+				file_content += `${key}=${json[key]}\n`;
+			}
+
+			if (!(await exists('.env'))) {
+				// @ts-ignore
+				Deno.writeTextFileSync('.env', file_content);
+
+				console.log(green('Le fichier .env à été créé avec succès'))
+			} else {
+				console.warn(yellow('WARNING : le fichier .env existe déjà'))
+			}
+		} catch (e) {
+			console.error(red(bold('ERROR :') + ' le json fournis n\'est pas au bon format !'))
+		}
+	});
+
+program.command('db:migrate')
+	.description('migrate database')
+	.action(async () => {
+		try {
+			await Database.migrate();
+			console.log(green('migration successful !'))
+		} catch (e) {
+			console.error(red(bold('ERROR :') + ' ' + e.message))
+		}
+	})
+
+// @ts-ignore
+program.parse(Deno.args)
