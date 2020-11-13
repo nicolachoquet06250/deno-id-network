@@ -1,4 +1,4 @@
-import { User } from "./api/models/User.ts";
+import { User } from "./api/models/mod.ts";
 import { Database } from "./lib/database/Database.ts";
 
 

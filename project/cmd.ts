@@ -1,7 +1,7 @@
 import { Command } from 'https://cdn.depjs.com/cmd/mod.ts';
 import { red, yellow, green, bold } from "https://deno.land/std@0.74.0/fmt/colors.ts";
 import { exists } from "https://deno.land/std@0.61.0/fs/mod.ts";
-import { Database } from "./lib/database/Database.ts";
+import {models} from "./api/models/mod.ts";
 
 const program = new Command('network-id');
 
@@ -40,12 +40,20 @@ program.command('db:migrate')
 	.description('migrate database')
 	.action(async () => {
 		try {
-			await Database.migrate();
+			// @ts-ignore
+			await Promise.all(models.map(m => m.migrate()))
 			console.log(green('migration successful !'))
 		} catch (e) {
 			console.error(red(bold('ERROR :') + ' ' + e.message))
 		}
-	})
+	});
+
+program.command('make:migration').action(async () => {
+	for (let model of models) {
+		// @ts-ignore
+		await model.create_migration();
+	}
+})
 
 // @ts-ignore
 program.parse(Deno.args)

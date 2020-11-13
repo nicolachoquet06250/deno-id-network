@@ -1,1 +1,5 @@
-export { User } from "./User.ts";
+import { User } from "./User.ts";
+
+export { User };
+
+export const models = [ User ];
