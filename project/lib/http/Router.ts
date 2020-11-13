@@ -1,6 +1,7 @@
 import { Router } from "https://deno.land/x/oak/mod.ts";
 import { DependencyInjection } from "../dis/DependencyInjection.ts";
 import { upload } from "../middlewares/upload/mod.ts";
+import { Context } from "./mod.ts";
 
 export enum HttpMethod {
 	GET = 'get',
@@ -77,16 +78,26 @@ export class CustomRouter {
 			methodToCall(CustomRouter._groupUrls[route.target.constructor.name] + route.route, async (context: any) => {
 				const target = route.target.constructor;
 				const callback = route.callback;
+
+				Context.create(context);
+
 				const ctx = DependencyInjection.instantiateType(target);
-				await ctx[callback](context);
+				await ctx[callback](Context.create());
+
+				Context.reset();
 			}, route.upload);
 			if (route.route === '/' && CustomRouter._groupUrls[route.target.constructor.name] !== '') {
 				// @ts-ignore
 				methodToCall(CustomRouter._groupUrls[route.target.constructor.name], async (context: any) => {
 					const target = route.target.constructor;
 					const callback = route.callback;
+
+					Context.create(context);
+
 					const ctx = DependencyInjection.instantiateType(target);
-					await ctx[callback](context);
+					await ctx[callback](Context.create());
+
+					Context.reset();
 				}, route.upload);
 			}
 			if (route.name) {

@@ -1,6 +1,5 @@
 import { DependencyInjection } from "../dis/DependencyInjection.ts";
-import { CustomObject } from "./db.ts";
-import { getParams } from "./http.ts";
+import { CustomObject, getParams } from "./mod.ts";
 
 export function ConstructorInjection() {
 	return function (target: {} | any) {

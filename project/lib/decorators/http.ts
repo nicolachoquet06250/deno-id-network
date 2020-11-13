@@ -1,4 +1,4 @@
-import { CustomRouter, HttpMethod } from "../http/Router.ts";
+import { CustomRouter, HttpMethod } from "../http/mod.ts";
 
 export function getParams(func: Function) {
 	const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;

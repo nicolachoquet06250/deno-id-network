@@ -1,4 +1,4 @@
-import { Field, Key, Model, Watch } from "../../lib/decorators/db.ts";
+import { Field, Key, Model, Watch } from "../../lib/decorators/mod.ts";
 
 @Model({ table: 'user' })
 export class User {

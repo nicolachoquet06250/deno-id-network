@@ -1,7 +1,7 @@
 import "https://deno.land/x/dotenv/load.ts";
 
 import { Client } from "https://deno.land/x/mysql/mod.ts";
-import { FieldConfig, ModelConfig } from "../decorators/db.ts";
+import { FieldConfig, ModelConfig } from "../decorators/mod.ts";
 
 export class Database {
 	private static _connexion?: Promise<Client>;

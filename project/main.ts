@@ -1,7 +1,7 @@
 import "https://deno.land/x/dotenv/load.ts";
 
-import { CustomRouter as Router } from "./lib/http/Router.ts";
 import { Application } from "https://deno.land/x/oak/mod.ts";
+import { CustomRouter as Router } from "./lib/http/mod.ts";
 import { getAllRoutes } from "./api/mod.ts";
 
 class Main {
@@ -9,16 +9,9 @@ class Main {
 		// @ts-ignore
 		const { IP, PORT, DOMAIN } = Deno.env.toObject();
 		
-		let objectToListen = {
-			port: 8000,
-			hostname: '127.0.0.1'
-		};
-		if (PORT) {
-			objectToListen.port = parseInt(PORT);
-		}
-		if (IP) {
-			objectToListen.hostname = IP;
-		}
+		let objectToListen = { port: 8000, hostname: '127.0.0.1' };
+		if (PORT) objectToListen.port = parseInt(PORT);
+		if (IP) objectToListen.hostname = IP;
 
 		getAllRoutes();
 
