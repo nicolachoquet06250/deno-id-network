@@ -41,7 +41,7 @@ export class Home {
 							try {
 								// Connexion vers un serveur HTTPS
 							    // prennant en charge le protocole WebSocket over SSL ("wss://").
-							    socket = new WebSocket("${url}/messages");
+							    socket = new WebSocket(window.location.protocol.replace('http', 'ws') + "//" + window.location.hostname + "/messages");
 							   
 								// Récupération des erreurs.
 								// Si la connexion ne s'établie pas,
