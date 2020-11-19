@@ -41,7 +41,7 @@ export class Home {
 							try {
 								// Connexion vers un serveur HTTPS
 							    // prennant en charge le protocole WebSocket over SSL ("wss://").
-							    socket = new WebSocket(window.location.protocol.replace('http', 'ws') + "//" + window.location.hostname + "/messages");
+							    socket = new WebSocket(window.location.protocol.replace('http', 'ws') + "//127.0.0.1:8080");
 							   
 								// Récupération des erreurs.
 								// Si la connexion ne s'établie pas,
@@ -52,8 +52,6 @@ export class Home {
 								
 								// Lorsque la connexion est établie.
 								socket.onopen = function(event) {
-								    console.log("Connexion établie.");
-								
 								    // Lorsque la connexion se termine.
 								    this.onclose = function(event) {
 								        console.log("Connexion terminé.");
@@ -61,7 +59,12 @@ export class Home {
 								
 								    // Lorsque le serveur envoi un message.
 								    this.onmessage = function(event) {
-								        console.log("Message:", event.data);
+								    	try {
+								    		const json = JSON.parse(event.data);
+									        console.log("Message:", json);
+								    	} catch (e) {
+								    		console.log("Message:", event.data);
+								    	}
 								    };
 								
 								    // Envoi d'un message vers le serveur.
