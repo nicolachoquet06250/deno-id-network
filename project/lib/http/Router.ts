@@ -57,6 +57,24 @@ export class CustomRouter {
 	}
 
 	public routes() {
+		const callback = async (context: any, next: Function, route: Route) => {
+			const { target, callback } = route;
+
+			const _context = DependencyInjection.instantiateType(Context, context, next);
+
+			try {
+				const ctx = DependencyInjection.instantiateType(target.constructor);
+				await ctx[callback](_context);
+			} catch (e) {
+				_context.set_status(500).respond({
+					status: 'error',
+					code: 500,
+					message: e.message
+				})
+			}
+
+		};
+
 		for (let route of CustomRouter._routes) {
 			let httpMethod: string;
 			switch (route.httpMethod) {
@@ -74,43 +92,12 @@ export class CustomRouter {
 			eval(`methodToCall = this.${httpMethod};`);
 
 			// @ts-ignore
-			methodToCall(CustomRouter._groupUrls[route.target.constructor.name] + route.route, async (context: any, next: Function) => {
-				const target = route.target.constructor;
-				const callback = route.callback;
-
-				const _context = DependencyInjection.instantiateType(Context, context, next);
-
-				try {
-					const ctx = DependencyInjection.instantiateType(target);
-					await ctx[callback](_context);
-				} catch (e) {
-					_context.set_status(500).respond({
-						status: 'error',
-						code: 500,
-						message: e.message
-					})
-				}
-
-			}, route.upload);
+			methodToCall(CustomRouter._groupUrls[route.target.constructor.name] + route.route, async (context: any, next: Function) =>
+				await callback(context, next, route), route.upload);
 			if (route.route === '/' && CustomRouter._groupUrls[route.target.constructor.name] !== '') {
 				// @ts-ignore
-				methodToCall(CustomRouter._groupUrls[route.target.constructor.name], async (context: any, next: Function) => {
-					const target = route.target.constructor;
-					const callback = route.callback;
-
-					const _context = DependencyInjection.instantiateType(Context, context, next);
-
-					try {
-						const ctx = DependencyInjection.instantiateType(target);
-						await ctx[callback](_context);
-					} catch (e) {
-						_context.set_status(500).respond({
-							status: 'error',
-							code: 500,
-							message: e.message
-						})
-					}
-				}, route.upload);
+				methodToCall(CustomRouter._groupUrls[route.target.constructor.name], async (context: any, next: Function) =>
+					await callback(context, next, route), route.upload);
 			}
 
 			if (route.name) {
@@ -120,6 +107,7 @@ export class CustomRouter {
 				}
 			}
 		}
+
 		return CustomRouter.instance.routes();
 	}
 
@@ -139,4 +127,9 @@ export class CustomRouter {
 		}
 		throw new Error(`route named ${name} not found !`);
 	}
+}
+
+export class WebsocketRouter {
+	public static _routes: Array<Route> = []
+	public static _groupUrls: Map<string, string> = new Map<string, string>();
 }

@@ -6,7 +6,7 @@ import {
 	CustomObject
 } from "../../lib/decorators/mod.ts";
 import { User as UserModel } from "../../api/models/mod.ts";
-import { Context, CustomRouter } from "../../lib/http/mod.ts";
+import { CustomRouter, Context } from "../../lib/http/mod.ts";
 
 @Controller('/user')
 export class User {

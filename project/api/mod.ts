@@ -1,8 +1,6 @@
 import { Home, User, Image } from "./controllers/mod.ts";
+import { Messages } from "./websockets/Messages.ts";
 
-const controllers = [ Home, User, Image ];
-
-export const getAllRoutes = () => {
-	return controllers;
-}
+export const getAllRoutes = () =>
+	[ Home, User, Image, Messages ];
 
