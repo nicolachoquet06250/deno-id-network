@@ -1,6 +1,5 @@
 import { InjectedProperty, Websocket, WSInit } from "../../lib/decorators/mod.ts";
 import { WSContext } from "../../lib/http/mod.ts";
-import { WebSocket } from "../../lib/middlewares/websocket/mod.ts";
 
 @Websocket('/messages')
 export class Messages {
@@ -10,25 +9,25 @@ export class Messages {
 
 	@WSInit
 	public async on_connect() {
-		console.log(this.context);
 		if (this.context && this.context.socket) {
-			const socket: WebSocket = this.context.socket;
-			this.context.send('Hello World');
-			console.log(socket);
+			// console.log('on_connect', this.context.socket);
+			console.log('on_connect |', 'You are connected');
+			this.context.user.send('Hello World');
+			this.context.broadcast.send('Hello World');
 		}
 	}
 
 	public async on_disconnect() {
 		if (this.context && this.context.socket) {
-			const socket: WebSocket = this.context.socket;
-			console.log(socket);
+			console.log('on_disconnect |', 'Bye');
+			// console.log('on_disconnect |', this.context.socket);
 		}
 	}
 
 	public async on_message(message: string) {
-		if (this.context && this.context.socket) {
-			const socket: WebSocket = this.context.socket;
-			console.log(socket, message);
+		if (this.context) {
+			// console.log('on_message', this.context.socket);
+			this.context.user.send('on_message | ' + message)
 		}
 	}
 }

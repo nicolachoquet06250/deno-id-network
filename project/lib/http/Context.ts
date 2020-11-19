@@ -70,29 +70,36 @@ export class Context {
 	}
 }
 
+type Users = Map<number, WebSocket>;
+
 export class WSContext extends Context {
-	public users?: Map<string, WebSocket>;
+	public users?: Users;
 	public socket?: WebSocket;
-	public user_id?: string;
+	public user_id?: number;
 
-	public static users?: Map<string, WebSocket>;
+	public static users?: Users;
 	public static socket?: WebSocket;
-	public static user_id?: string;
+	public static user_id?: number;
 
-	public get user(): WebSocket|null {
-		let users = undefined;
-		if (this.users) {
-			users = this.users;
-		}
-		let user = undefined;
-		if (users && this.user_id) {
-			user = users.get(this.user_id);
-		}
-		if (user) return user;
-		return null;
+	public get user(): WebSocket {
+		// @ts-ignore
+		return this.users.get(this.user_id);
 	}
 
-	public static create(ctx?: any, next?: Function, socket?: WebSocket, users?: Map<string, WebSocket>, user_id?: string): Context {
+	public get broadcast(): { send: Function } {
+		const that = this;
+		return {
+			send(message: string) {
+				if (!that.users) throw new Error('the users set is not defined !');
+
+				for (const user of that.users.values()) {
+					user.send(that.user_id ? `[${that.user_id}]: ${message}` : message);
+				}
+			}
+		};
+	}
+
+	public static create(ctx?: any, next?: Function, socket?: WebSocket, users?: Users, user_id?: number): Context {
 		if (ctx !== undefined) this.ctx = ctx;
 		if (next !== undefined) this.next = next;
 		if (users !== undefined) this.users = users;
@@ -102,28 +109,11 @@ export class WSContext extends Context {
 		return new WSContext(this.ctx, this.next, this.socket, this.users, this.user_id);
 	}
 
-	protected constructor(context?: any, next?: Function, socket?: WebSocket, users?: Map<string, WebSocket>, user_id?: string) {
+	protected constructor(context?: any, next?: Function, socket?: WebSocket, users?: Users, user_id?: number) {
 		super(context, next);
 
 		this.users = users;
 		this.socket = socket;
 		this.user_id = user_id;
-	}
-
-	public broadcast(message: string) {
-		if (!this.users) throw new Error('the users set is not defined !');
-
-		for (const user of this.users.values()) {
-			user.send(this.user_id ? `[${this.user_id}]: ${message}` : message);
-		}
-	}
-
-	public send(message: any) {
-		if (!this.users || !this.user_id) throw new Error('the users set is not defined !');
-
-		let user: WebSocket|null;
-		if ((user = this.user)) {
-			user.send(message);
-		}
 	}
 }
