@@ -101,12 +101,13 @@ class Main {
 	}
 }
 
-const firstArg = Main.args[0].toUpperCase();
+const arg = Main.args[0] || '';
+const firstArg = arg.toUpperCase();
 // @ts-ignore
 const mode = MODES[firstArg];
 
 
-if (Main.args[0] && mode !== undefined) {
+if (mode !== undefined) {
 	Main.func_name = `run_${mode}`;
 	await Main.func();
 } else await Main.run_web();
