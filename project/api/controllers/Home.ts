@@ -1,11 +1,14 @@
 import { Controller, Get, InjectedProperty } from "../../lib/decorators/mod.ts";
-import { Context } from "../../lib/http/mod.ts";
+import {Context, CustomRouter} from "../../lib/http/mod.ts";
 
 @Controller()
 export class Home {
 
 	@InjectedProperty({ type: Context })
 	private context?: Context;
+
+	@InjectedProperty({ type: CustomRouter })
+	private router?: CustomRouter;
 
 	@Get()
 	@Get('/home')
@@ -23,7 +26,10 @@ export class Home {
 		if (this.context) {
 			// @ts-ignore
 			const { DOMAIN, SECURE } = Deno.env.toObject();
-			const url = 'http' + (Boolean(parseInt(SECURE)) ? 's' : '')  + '://' + (DOMAIN ? DOMAIN : this.context.request().url.origin);
+
+			const url = 'http' + (Boolean(parseInt(SECURE)) ? 's' : '')  + '://' + (DOMAIN ? DOMAIN : this.context.request().url.hostname)
+				// @ts-ignore
+				+ this.router.url('ts_file', { file: 'app' });
 
 			this.context.init_headers({ 'Content-Type': 'text/html' }).respond(`
 				<!DOCTYPE html>
@@ -34,7 +40,7 @@ export class Home {
 					</head>
 					<body>
 						
-						<script src="${url}/public/scripts/app.js"></script>
+						<script src="${url}"></script>
 					</body>
 				</html>
 			`);

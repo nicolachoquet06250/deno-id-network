@@ -14,7 +14,7 @@ export class TypeScript {
 		return Deno;
 	}
 
-	@Get('/:file.js')
+	@Get('/:file.js', 'ts_file')
 	public async get_bundle() {
 		if (this.context && this.context.has_param('file')) {
 			const path = `${this.deno.cwd()}/project/public/ts/${this.context.param('file')}.ts`;

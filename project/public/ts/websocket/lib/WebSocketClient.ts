@@ -23,7 +23,6 @@ export class WebSocketClient {
 		private secure: boolean = true,
 		private route: string = '/'
 	) {
-		console.log(`${this.secure ? 'wss' : 'ws'}://${this.hostname}${this.port ? `:${this.port}` : ''}${this.route}`);
 		this.socket = new WebSocket(`${this.secure ? 'wss' : 'ws'}://${this.hostname}${this.port ? `:${this.port}` : ''}${this.route}`);
 	}
 
