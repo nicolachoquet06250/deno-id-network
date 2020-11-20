@@ -1,7 +1,7 @@
 import { Command } from 'https://cdn.depjs.com/cmd/mod.ts';
 import { red, yellow, green, bold } from "https://deno.land/std@0.74.0/fmt/colors.ts";
 import { exists } from "https://deno.land/std@0.61.0/fs/mod.ts";
-import {models} from "./api/models/mod.ts";
+import { models } from "./api/models/mod.ts";
 
 const program = new Command('network-id');
 

@@ -1,7 +1,7 @@
 import { Controller, Get, InjectedProperty } from "../../lib/decorators/mod.ts";
 import { Context } from "../../lib/http/Context.ts";
 import { exists } from "https://deno.land/std@0.61.0/fs/mod.ts";
-import { red, yellow, green, bold } from "https://deno.land/std@0.74.0/fmt/colors.ts";
+import { yellow } from "https://deno.land/std@0.74.0/fmt/colors.ts";
 
 @Controller('/public/scripts')
 export class TypeScript {

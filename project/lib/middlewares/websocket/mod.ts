@@ -6,8 +6,6 @@ import { acceptWebSocket, isWebSocketCloseEvent, acceptable } from "https://deno
 import type { WebSocket } from "https://deno.land/std/ws/mod.ts";
 export { generate } from "https://deno.land/std@0.61.0/uuid/v4.ts";
 
-// const users = new Map<number, WebSocket>();
-// const socks: WebSocket[] = [];
 export const users = new Set();
 
 
@@ -23,64 +21,6 @@ function broadcast(msg: any) {
 
 
 export const middleware = async (context: any, next: Function, route: Route) => {
-	/*await context.upgrade();
-
-	if (acceptable(context.request.serverRequest)) {
-		const { conn, r: bufReader, w: bufWriter, headers } = context.request.serverRequest;
-		const { target, callback } = route;
-
-		try {
-			const socket: WebSocket = await acceptWebSocket({conn, bufReader, bufWriter, headers});
-
-			let userId = socks.push(socket) - 1;
-			// Register user connection
-			console.log('user_id', userId, 'socket', socket);
-			users.set(userId, socket);
-
-			const _context = DependencyInjection.instantiateType(WSContext, context, next, socket, users, userId);
-
-			try {
-				const ctx = DependencyInjection.instantiateType(target.constructor);
-				// on_connect
-				await ctx[callback](_context);
-
-				// Wait for new messages
-				for await (const event of socket) {
-					// Unregister user connection
-					if (isWebSocketCloseEvent(event)) {
-						console.log('on_disconnect callback');
-						if ('on_disconnect' in ctx) {
-							await ctx.on_disconnect(_context);
-						}
-
-						users.delete(userId);
-						socks.splice(userId, 1);
-						break;
-					}
-
-					const message = typeof event === "string" ? event : "";
-
-					console.log('on_message function')
-					if ('on_message' in ctx) {
-						await ctx.on_message(message, _context);
-					}
-				}
-
-			} catch (e) {
-				_context.set_status(500).respond({
-					status: 'error',
-					code: 500,
-					message: e.message
-				})
-			}
-		} catch (e) {
-			console.error(e);
-			return await next();
-		}
-	} else {
-		throw new Error('Error when connecting websocket');
-	}*/
-
 	context.response.status = 204;
 
 	if (!acceptable(context.request.serverRequest)) {

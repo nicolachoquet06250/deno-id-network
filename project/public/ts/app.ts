@@ -1,4 +1,4 @@
-import {EventType, MessageType, WebSocketClient} from "./websocket/lib/WebSocketClient.ts";
+import { EventType, MessageType, WebSocketClient } from "./websocket/lib/WebSocketClient.ts";
 
 const ws = new WebSocketClient(
 	window.location.hostname,

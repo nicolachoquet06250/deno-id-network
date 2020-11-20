@@ -1,4 +1,4 @@
-import {users, WebSocket} from "../middlewares/websocket/mod.ts";
+import { WebSocket } from "../middlewares/websocket/mod.ts";
 
 export class Context {
 	protected headers?: Headers;
@@ -96,12 +96,6 @@ export class WSContext extends Context {
 		const that = this;
 		return {
 			send(message: string) {
-				/*if (!that.users) throw new Error('the users set is not defined !');
-
-				for (const user of that.users.values()) {
-					user.send(that.user_id ? `[${that.user_id}]: ${message}` : message);
-				}*/
-
 				if (that.users) {
 					that.users.forEach((user: WebSocket) => {
 						if (user.conn.rid !== that.user_id) {

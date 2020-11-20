@@ -1,6 +1,6 @@
 import { Database } from "../database/Database.ts";
 import { recursiveReaddir } from "https://deno.land/x/recursive_readdir/mod.ts";
-import { exists, ensureDir, readFileStr, readFileStrSync } from "https://deno.land/std@0.61.0/fs/mod.ts";
+import { exists, ensureDir, readFileStr } from "https://deno.land/std@0.61.0/fs/mod.ts";
 
 export class CustomObject extends Object {
 	static values(object: any): any[] {

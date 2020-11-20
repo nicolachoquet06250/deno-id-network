@@ -1,6 +1,9 @@
 // Copyright 2018-2020 the Deno authors. All rights reserved. MIT license.
 import { serve } from "https://deno.land/std@0.78.0/http/server.ts";
-import { acceptWebSocket, isWebSocketPingEvent, isWebSocketCloseEvent, WebSocket } from "https://deno.land/std@0.78.0/ws/mod.ts";
+import {
+	acceptWebSocket, isWebSocketPingEvent,
+	isWebSocketCloseEvent, WebSocket
+} from "https://deno.land/std@0.78.0/ws/mod.ts";
 
 export enum EVENTS {
 	ABORT = 'abort',
