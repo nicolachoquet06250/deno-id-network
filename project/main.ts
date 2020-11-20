@@ -46,3 +46,5 @@ class Main {
 }
 
 await Main.run_web();
+
+
