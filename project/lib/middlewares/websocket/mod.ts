@@ -102,23 +102,17 @@ export const middleware = async (context: any, next: Function, route: Route) => 
 	// on_connect
 	await ctx[callback](_context);
 
-	// broadcast(`hello! ${socket.conn.rid}`);
-
 	for await (const ev of socket) {
 		if (socket.isClosed) {
-			console.log('on_disconnect callback');
 			if ('on_disconnect' in ctx) {
 				await ctx.on_disconnect(_context);
 			}
 			users.delete(socket);
-			// broadcast(`bye! ${socket.conn.rid}`);
 			break;
 		} else {
-			console.log('on_message function')
 			if ('on_message' in ctx) {
 				await ctx.on_message(ev, _context);
 			}
-			// broadcast(ev);
 		}
 	}
 };

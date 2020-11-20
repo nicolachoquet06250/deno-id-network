@@ -20,14 +20,22 @@ export class Messages {
 	public async on_disconnect() {
 		if (this.context) {
 			console.log('on_disconnect |', 'Bye');
-			// console.log('on_disconnect |', this.context.socket);
 		}
 	}
 
 	public async on_message(message: string) {
 		if (this.context) {
-			// console.log('on_message', this.context.socket);
-			this.context.user.send('on_message | ' + message)
+			try {
+				this.context.user.send(
+					JSON.stringify({
+						function: 'on_message',
+						type: 'json',
+						message: JSON.parse(message)
+					})
+				);
+			} catch (e) {
+				this.context.user.send(`on_message | ${message}`);
+			}
 		}
 	}
 }
