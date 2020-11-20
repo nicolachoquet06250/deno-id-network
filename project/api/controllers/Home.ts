@@ -37,7 +37,9 @@ export class Home {
 					<body>
 						
 						<script>
-							const pipe = new WebSocket("ws://" + window.location.hostname.replace('http', 'ws') + "/messages"); 
+							const pipe = new WebSocket(window.location.protocol.replace('http', 'ws') + 
+								"//" + window.location.hostname + 
+								"/messages"); 
 			
 							function fire(ev){     
 								switch(ev.type){     
