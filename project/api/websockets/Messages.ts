@@ -9,16 +9,16 @@ export class Messages {
 
 	@WSInit
 	public async on_connect() {
-		if (this.context && this.context.socket) {
+		if (this.context) {
 			// console.log('on_connect', this.context.socket);
 			console.log('on_connect |', 'You are connected');
-			this.context.user.send('Hello World');
-			this.context.broadcast.send('Hello World');
+			this.context.user.send('Hello World ' + this.context.user_id);
+			this.context.broadcast.send('Hello World de ' + this.context.user_id);
 		}
 	}
 
 	public async on_disconnect() {
-		if (this.context && this.context.socket) {
+		if (this.context) {
 			console.log('on_disconnect |', 'Bye');
 			// console.log('on_disconnect |', this.context.socket);
 		}

@@ -1,4 +1,4 @@
-import { WebSocket } from "../middlewares/websocket/mod.ts";
+import {users, WebSocket} from "../middlewares/websocket/mod.ts";
 
 export class Context {
 	protected headers?: Headers;
@@ -70,7 +70,7 @@ export class Context {
 	}
 }
 
-type Users = Map<number, WebSocket>;
+type Users = Set<WebSocket>;
 
 export class WSContext extends Context {
 	public users?: Users;
@@ -83,17 +83,31 @@ export class WSContext extends Context {
 
 	public get user(): WebSocket {
 		// @ts-ignore
-		return this.users.get(this.user_id);
+		return Array.from(this.users)
+			.reduce((reducer: WebSocket, current: WebSocket) => {
+				if (current.conn.rid === this.user_id) {
+					reducer = current;
+				}
+				return reducer;
+			});
 	}
 
 	public get broadcast(): { send: Function } {
 		const that = this;
 		return {
 			send(message: string) {
-				if (!that.users) throw new Error('the users set is not defined !');
+				/*if (!that.users) throw new Error('the users set is not defined !');
 
 				for (const user of that.users.values()) {
 					user.send(that.user_id ? `[${that.user_id}]: ${message}` : message);
+				}*/
+
+				if (that.users) {
+					that.users.forEach((user: WebSocket) => {
+						if (user.conn.rid !== that.user_id) {
+							user.send(message);
+						}
+					});
 				}
 			}
 		};

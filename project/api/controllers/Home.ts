@@ -37,42 +37,43 @@ export class Home {
 					<body>
 						
 						<script>
-							let socket = null;
-							try {
-								// Connexion vers un serveur HTTPS
-							    // prennant en charge le protocole WebSocket over SSL ("wss://").
-							    socket = new WebSocket(window.location.protocol.replace('http', 'ws') + "//ws." + window.location.hostname);
-							   
-								// Récupération des erreurs.
-								// Si la connexion ne s'établie pas,
-								// l'erreur sera émise ici.
-								socket.onerror = function(error) {
-								    console.error(error);
-								};
-								
-								// Lorsque la connexion est établie.
-								socket.onopen = function(event) {
-								    // Lorsque la connexion se termine.
-								    this.onclose = function(event) {
-								        console.log("Connexion terminé.");
-								    };
-								
-								    // Lorsque le serveur envoi un message.
-								    this.onmessage = function(event) {
-								    	try {
-								    		const json = JSON.parse(event.data);
-									        console.log("Message:", json);
-								    	} catch (e) {
-								    		console.log("Message:", event.data);
-								    	}
-								    };
-								
-								    // Envoi d'un message vers le serveur.
-								    this.send("Hello world!");
-								};
-							} catch (exception) {
-							    console.error(exception);
-							}
+							const pipe = new WebSocket("ws://" + window.location.hostname.replace('http', 'ws') + "/messages"); 
+			
+							function fire(ev){     
+								switch(ev.type){     
+									case 'message':         
+										switch(typeof ev.data){         
+											case 'string':             
+												console.log('msg text', ev.data);         
+												break;         
+												case 'object':             
+													ev.data.arrayBuffer().then(ab => { 
+														console.log(new Uint8Array(ab)); 
+													});         
+													break;         
+										}     
+										break;     
+									default:         
+										console.log(ev.type ,ev);     
+								} 
+							} 
+							
+							function hello(msg){     
+								if(msg === undefined){         
+									msg = new ArrayBuffer(4);        
+									const uint = new Uint8Array(msg); 
+									uint[0] = 4;    
+									uint[1] = 3;    
+									uint[2] = 2;    
+									uint[3] = 1;  
+								}  
+								pipe.send(msg); 
+							}  
+							
+							pipe.addEventListener('open', fire); 
+							pipe.addEventListener('close', fire); 
+							pipe.addEventListener('message', fire); 
+							pipe.addEventListener('error', fire);
 						</script>
 					</body>
 				</html>

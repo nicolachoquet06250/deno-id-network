@@ -6,11 +6,24 @@ import { acceptWebSocket, isWebSocketCloseEvent, acceptable } from "https://deno
 import type { WebSocket } from "https://deno.land/std/ws/mod.ts";
 export { generate } from "https://deno.land/std@0.61.0/uuid/v4.ts";
 
-const users = new Map<number, WebSocket>();
-const socks: WebSocket[] = [];
+// const users = new Map<number, WebSocket>();
+// const socks: WebSocket[] = [];
+export const users = new Set();
+
+
+function broadcastEach(user: any) {
+	// @ts-ignore
+	user.send(this);
+}
+
+function broadcast(msg: any) {
+	console.log('---broadcasting--->', typeof msg, msg);
+	users.forEach(broadcastEach, msg);
+}
+
 
 export const middleware = async (context: any, next: Function, route: Route) => {
-	await context.upgrade();
+	/*await context.upgrade();
 
 	if (acceptable(context.request.serverRequest)) {
 		const { conn, r: bufReader, w: bufWriter, headers } = context.request.serverRequest;
@@ -66,6 +79,47 @@ export const middleware = async (context: any, next: Function, route: Route) => 
 		}
 	} else {
 		throw new Error('Error when connecting websocket');
+	}*/
+
+	context.response.status = 204;
+
+	if (!acceptable(context.request.serverRequest)) {
+		context.response.status = 400;
+		throw new Error(`not upgradable to WebSocket`);
+	}
+
+	const socket = await context.upgrade();
+
+	const userId = socket.conn.rid;
+
+	users.add(socket);
+
+	const { target, callback } = route;
+
+	const _context = DependencyInjection.instantiateType(WSContext, context, next, socket, users, userId);
+
+	const ctx = DependencyInjection.instantiateType(target.constructor);
+	// on_connect
+	await ctx[callback](_context);
+
+	// broadcast(`hello! ${socket.conn.rid}`);
+
+	for await (const ev of socket) {
+		if (socket.isClosed) {
+			console.log('on_disconnect callback');
+			if ('on_disconnect' in ctx) {
+				await ctx.on_disconnect(_context);
+			}
+			users.delete(socket);
+			// broadcast(`bye! ${socket.conn.rid}`);
+			break;
+		} else {
+			console.log('on_message function')
+			if ('on_message' in ctx) {
+				await ctx.on_message(ev, _context);
+			}
+			// broadcast(ev);
+		}
 	}
 };
 
