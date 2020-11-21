@@ -9,17 +9,6 @@ export { generate } from "https://deno.land/std@0.61.0/uuid/v4.ts";
 export const users = new Set();
 
 
-function broadcastEach(user: any) {
-	// @ts-ignore
-	user.send(this);
-}
-
-function broadcast(msg: any) {
-	console.log('---broadcasting--->', typeof msg, msg);
-	users.forEach(broadcastEach, msg);
-}
-
-
 export const middleware = async (context: any, next: Function, route: Route) => {
 	context.response.status = 204;
 
@@ -50,6 +39,24 @@ export const middleware = async (context: any, next: Function, route: Route) => 
 			users.delete(socket);
 			break;
 		} else {
+			try {
+				const json = JSON.parse(ev);
+				if ('channel' in json && `on_channel_${json.channel}` in ctx) {
+					const channel = json.channel;
+					delete json.channel;
+					ctx[`on_channel_${channel}`](json, _context);
+				} else {
+					if ('on_json' in ctx) {
+						await ctx.on_json(json, _context);
+						break;
+					}
+				}
+			} catch(e) {
+				if (typeof ev === "string" && 'on_text' in ctx) {
+					await ctx.on_text(ev, _context);
+					break;
+				}
+			}
 			if ('on_message' in ctx) {
 				await ctx.on_message(ev, _context);
 			}

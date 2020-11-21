@@ -81,28 +81,60 @@ export class WSContext extends Context {
 	public static socket?: WebSocket;
 	public static user_id?: number;
 
-	public get user(): WebSocket {
+	public get user(): { send: Function, send_channel: Function } {
 		// @ts-ignore
-		return Array.from(this.users)
+		const ws: WebSocket = Array.from(this.users)
 			.reduce((reducer: WebSocket, current: WebSocket) => {
 				if (current.conn.rid === this.user_id) {
 					reducer = current;
 				}
 				return reducer;
 			});
+
+		return {
+			send(message: Record<string, any>|string) {
+				if (typeof message === "string" || message instanceof Uint8Array) {
+					ws.send(message);
+				} else {
+					ws.send(JSON.stringify(message));
+				}
+			},
+			send_channel(channel: string, message: Record<string, any>|string) {
+				let _message;
+				if (typeof message === "string") {
+					_message = { channel, message };
+				} else {
+					_message = { channel, ...message };
+				}
+				this.send(_message)
+			}
+		}
 	}
 
-	public get broadcast(): { send: Function } {
+	public get broadcast(): { send: Function, send_channel: Function } {
 		const that = this;
 		return {
-			send(message: string) {
+			send(message: Record<string, any>|string) {
 				if (that.users) {
 					that.users.forEach((user: WebSocket) => {
 						if (user.conn.rid !== that.user_id) {
-							user.send(message);
+							if (typeof message === "string" || message instanceof Uint8Array) {
+								user.send(message);
+							} else {
+								user.send(JSON.stringify(message));
+							}
 						}
 					});
 				}
+			},
+			send_channel(channel: string, message: Record<string, any>|string) {
+				let _message;
+				if (typeof message === "string") {
+					_message = { channel, message };
+				} else {
+					_message = { channel, ...message };
+				}
+				this.send(_message)
 			}
 		};
 	}

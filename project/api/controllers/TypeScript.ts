@@ -23,22 +23,30 @@ export class TypeScript {
 
 				// @ts-ignore
 				if (diagnostics.length > 0) {
-					// const diags = JSON.parse(diagnostics);
 					// @ts-ignore
 					for (const diag of diagnostics) {
 						let warn = `WARN ( ${diag.code} ) | ${diag.messageText} | ${diag.fileName}`;
-						if (diag.start) {
-							warn += ` | l ${diag.start.line}:${diag.start.character}`;
+						if (diag.start) warn += ` | l ${diag.start.line}:${diag.start.character}`;
+						if (diag.end) warn += ` / l ${diag.end.line}:${diag.end.character}`;
+						let log_content = '';
+						if (await exists(`${this.deno.cwd()}/${this.context.param('file')}.log`)) {
+							log_content = await this.deno.readTextFile(`${this.deno.cwd()}/${this.context.param('file')}.log`);
 						}
-						if (diag.end) {
-							warn += ` / l ${diag.end.line}:${diag.end.character}`;
-						}
-						console.warn(yellow(warn))
+						await this.deno.writeTextFile(`${this.deno.cwd()}/${this.context.param('file')}.log`, `${log_content}\n${warn}`);
 					}
 				}
-
 				this.context.header('Content-Type', 'text/javascript').respond(emit);
 			}
+		}
+	}
+
+	@Get('/:file.css', 'css_file')
+	public async get_css() {
+		if (this.context && this.context.has_param('file')) {
+			this.context.header('Content-Type', 'text/css');
+			const path = `${this.deno.cwd()}/project/public/css/${this.context.param('file')}.css`;
+			if (await exists(path)) this.context.respond(await this.deno.readTextFile(path));
+			else this.context.set_status(404).respond('');
 		}
 	}
 }

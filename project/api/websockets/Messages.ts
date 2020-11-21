@@ -1,5 +1,6 @@
 import { InjectedProperty, Websocket, WSInit } from "../../lib/decorators/mod.ts";
 import { WSContext } from "../../lib/http/mod.ts";
+import { User } from "../models/mod.ts";
 
 @Websocket('/messages')
 export class Messages {
@@ -9,33 +10,50 @@ export class Messages {
 
 	@WSInit
 	public async on_connect() {
-		if (this.context) {
-			// console.log('on_connect', this.context.socket);
-			console.log('on_connect |', 'You are connected');
-			this.context.user.send('Hello World ' + this.context.user_id);
-			this.context.broadcast.send('Hello World de ' + this.context.user_id);
-		}
+		console.log('on_connect |', 'You are connected');
 	}
 
 	public async on_disconnect() {
 		if (this.context) {
-			console.log('on_disconnect |', 'Bye');
+			this.context.broadcast.send_channel('disconnect', {})
+		}
+		console.log('on_disconnect |', 'Bye');
+	}
+
+	public async on_channel_new_connexion(json: Record<string, any>) {
+		if (this.context) {
+			const userName = json.user.name;
+
+			// @ts-ignore
+			const users: User[] = await User.from({ name: userName });
+			if (users.length === 0) {
+				this.context.user.send_channel('new_connexion', {
+					error: true,
+					message: 'Vos identifiants sont incorrects'
+				})
+			} else {
+				const user: User = users[0];
+
+				// @ts-ignore
+				this.context.broadcast.send_channel('new_connexion', { user: user.toJson() })
+				this.context.user.send_channel('new_connexion', { error: false })
+			}
 		}
 	}
 
-	public async on_message(message: string) {
+	public async on_channel_already_connected(json: Record<string, any>) {
 		if (this.context) {
-			try {
-				this.context.user.send(
-					JSON.stringify({
-						function: 'on_message',
-						type: 'json',
-						message: JSON.parse(message)
-					})
-				);
-			} catch (e) {
-				this.context.user.send(`on_message | ${message}`);
-			}
+			this.context.broadcast.send_channel('already_connected', json);
+		}
+	}
+
+	public async on_json(json: Record<string, any>) {
+		if (this.context) {
+			this.context.user.send({
+				function: 'on_message',
+				type: 'json',
+				message: json
+			});
 		}
 	}
 }
