@@ -132,4 +132,6 @@ export class CustomRouter {
 export class WebsocketRouter {
 	public static _routes: Array<Route> = []
 	public static _groupUrls: Map<string, string> = new Map<string, string>();
+	public static _channelsPerRoute: Map<string, Map<string, string>> = new Map<string, Map<string, string>>();
+	public static _eventsPerRoute: Map<string, Map<string, string>> = new Map<string, Map<string, string>>();
 }

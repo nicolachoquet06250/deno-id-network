@@ -1,6 +1,7 @@
 import { InjectedProperty, Websocket, WSInit } from "../../lib/decorators/mod.ts";
 import { WSContext } from "../../lib/http/mod.ts";
 import { User } from "../models/mod.ts";
+import { Channel, Event } from "../../lib/decorators/websocket.ts";
 
 @Websocket('/messages')
 export class Messages {
@@ -13,6 +14,7 @@ export class Messages {
 		console.log('on_connect |', 'You are connected');
 	}
 
+	@Event('disconnect')
 	public async on_disconnect() {
 		if (this.context) {
 			this.context.broadcast.send_channel('disconnect', {})
@@ -20,7 +22,8 @@ export class Messages {
 		console.log('on_disconnect |', 'Bye');
 	}
 
-	public async on_channel_new_connexion(json: Record<string, any>) {
+	@Channel('new_connexion')
+	public async on_new_connexion(json: Record<string, any>) {
 		if (this.context) {
 			const userName = json.user.name;
 
@@ -41,12 +44,14 @@ export class Messages {
 		}
 	}
 
-	public async on_channel_already_connected(json: Record<string, any>) {
+	@Channel('already_connected')
+	public async on_already_connected(json: Record<string, any>) {
 		if (this.context) {
 			this.context.broadcast.send_channel('already_connected', json);
 		}
 	}
 
+	@Event('json')
 	public async on_json(json: Record<string, any>) {
 		if (this.context) {
 			this.context.user.send({
