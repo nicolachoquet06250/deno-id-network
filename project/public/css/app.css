@@ -173,7 +173,7 @@ body {
 .conv {
     width: 100%;
     margin: 0 auto;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 540px;
 }
 .talk {

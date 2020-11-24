@@ -80,6 +80,33 @@ const isWritten = () => `
 		</div>
 	</div>
 `;
+const scrollToBottom = () => {
+	const container: HTMLElement|null = document.querySelector('.conv');
+	if (container) {
+		const last_message: HTMLElement | null = container.querySelector('.talk:last-child');
+		if (last_message) {
+			// @ts-ignore
+			const top: number = Array.from(container.querySelectorAll('.talk'))
+				// @ts-ignore
+				.reduce((reducer: number, current: HTMLElement) => reducer + current.offsetHeight, 0);
+			if (Array.from(container.querySelectorAll('.talk')).length === 1) {
+				setTimeout(() => {
+					container.scroll({
+						top,
+						left: 0,
+						behavior: 'smooth'
+					});
+				}, 500);
+			} else {
+				container.scroll({
+					top,
+					left: 0,
+					behavior: 'smooth'
+				});
+			}
+		}
+	}
+};
 
 const no_messages = document.querySelector('.no-message');
 if (no_messages) {
@@ -227,6 +254,7 @@ if (login_form) {
 						no_message_text.style.display = 'none';
 					}
 					conv.innerHTML += createMessage(json.message, json.date, false);
+					scrollToBottom();
 				}
 			})
 
@@ -239,6 +267,7 @@ if (login_form) {
 					}
 					if (json.status) {
 						conv.innerHTML += isWritten();
+						scrollToBottom();
 					}
 				}
 			});
@@ -266,15 +295,10 @@ if (login_form) {
 					const message: HTMLInputElement|null = document.querySelector('.group-inp textarea');
 					const message_text = message ? message.value : ''
 
-					const objectToSend = {
-						message: message_text,
-						date: new Date()
-					};
+					const objectToSend = { message: message_text, date: new Date() };
 
 					ws.send_channel(CHANNELS.MESSAGE, objectToSend)
-					if (message) {
-						message.value = '';
-					}
+					if (message) message.value = '';
 
 					const conv = document.querySelector('.conv');
 					if (conv) {
@@ -284,6 +308,7 @@ if (login_form) {
 						}
 						conv.innerHTML += createMessage(objectToSend.message, objectToSend.date, true);
 					}
+					scrollToBottom();
 				})
 			}
 
