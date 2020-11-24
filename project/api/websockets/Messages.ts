@@ -17,7 +17,9 @@ export class Messages {
 	@Event('disconnect')
 	public async on_disconnect() {
 		if (this.context) {
-			this.context.broadcast.send_channel('disconnect', {})
+			this.context.broadcast.send_channel('disconnect', {
+				socket_id: this.context.user_id
+			})
 		}
 		console.log('on_disconnect |', 'Bye');
 	}
@@ -37,8 +39,11 @@ export class Messages {
 			} else {
 				const user: User = users[0];
 
-				// @ts-ignore
-				this.context.broadcast.send_channel('new_connexion', { user: user.toJson() })
+				this.context.broadcast.send_channel('new_connexion', {
+					// @ts-ignore
+					user: user.toJson(),
+					socket_id: this.context.user_id
+				})
 				this.context.user.send_channel('new_connexion', { error: false })
 			}
 		}
@@ -47,7 +52,24 @@ export class Messages {
 	@Channel('already_connected')
 	public async on_already_connected(json: Record<string, any>) {
 		if (this.context) {
-			this.context.broadcast.send_channel('already_connected', json);
+			this.context.broadcast.send_channel('already_connected', {
+				...json,
+				socket_id: this.context.user_id
+			});
+		}
+	}
+
+	@Channel('message')
+	public async on_message(json: { message: string, date: Date }) {
+		if (this.context) {
+			this.context.broadcast.send_channel('message', json);
+		}
+	}
+
+	@Channel('is_written')
+	public async on_written(json: { status: boolean }) {
+		if (this.context) {
+			this.context.broadcast.send_channel('is_written', json);
 		}
 	}
 

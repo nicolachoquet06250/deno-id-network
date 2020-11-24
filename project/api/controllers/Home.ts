@@ -76,8 +76,12 @@ export class Home {
 						        </div>
 						
 						        <div class="user">
-						            <p id="interlocutor-name">John Doe</p>
-						            <p id="interlocutor-state">Active Now</p>
+						        	<div class="interlocutor-container">
+							            <p id="interlocutor-name">Unknown User</p>
+							            <p id="interlocutor-state">Inactive Now</p>
+						            </div>
+						            <img src="/img/public/assets/images/warning.png" alt="warning" 
+						            	 title="Les messages ne sont pas persistants" />
 						        </div>
 						
 						        <div class="logos-call">
@@ -94,43 +98,10 @@ export class Home {
 						        </div>
 							</div>
 							
-							<div class="alert danger hide">
-								Une erreur est survenu lors de la connexion
-							</div>
+							<div class="alert danger hide"></div>
 							
 							<div class="conv">
-								<div class="talk left">
-									<img src="${this.router ? this.router.url(
-										'classic_images', { 
-											name: 'avatar2', 
-											ext: 'jpg' 
-										}) : ''}" alt="">
-									<p>Lorem ipsum dolor sit amet.</p>
-								</div>
-								<div class="talk right">
-									<p>Lorem ipsum dolor sit amet.</p>
-									<img src="${this.router ? this.router.url(
-										'classic_images', { 
-											name: 'avatar1', 
-											ext: 'jpg' 
-										}) : ''}" alt="">
-								</div>
-								<div class="talk left">
-									<img src="${this.router ? this.router.url(
-										'classic_images', { 
-											name: 'avatar2', 
-											ext: 'jpg' 
-										}) : ''}" alt="">
-									<p>Lorem ipsum dolor sit amet.</p>
-								</div>
-								<div class="talk right">
-									<p>Lorem ipsum dolor sit amet.</p>
-									<img src="${this.router ? this.router.url(
-										'classic_images', { 
-											name: 'avatar1', 
-											ext: 'jpg' 
-										}) : ''}" alt="">
-								</div>
+								<div class="no-message"></div>
 							</div>
 							
 							<form action="" class="conv-form">
@@ -153,7 +124,7 @@ export class Home {
 						            </div>
 						
 						
-						            <button class="submit-msg-btn">
+						    		<button class="submit-msg-btn">
 						                <img src="${this.router ? this.router.url(
 										'classic_images', {
 											name: 'send',
@@ -167,6 +138,32 @@ export class Home {
 						<script src="${url}"></script>
 					</body>
 				</html>
+			`);
+		}
+	}
+
+	@Get('/loader')
+	public async loader() {
+		if (this.context) {
+			this.context.init_headers({ 'Content-Type': 'text/html' }).respond(`
+			<!DOCTYPE html>
+			<html lang="fr">
+				<head>
+					<meta charset="utf-8" />
+					<title>Test de loader</title>
+					<link rel="stylesheet" href="${this.router ? this.router.url(
+					'css_file', {
+						file: 'app'
+					}) : ''}">
+				</head>
+				<body>
+					<div class="loader">
+						<div class="bubble bubble-1"></div>
+						<div class="bubble bubble-2"></div>
+						<div class="bubble bubble-3"></div>
+					</div>
+				</body>
+			</html>
 			`);
 		}
 	}
