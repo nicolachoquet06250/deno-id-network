@@ -171,12 +171,8 @@ body {
 /* **********CONVERSATION********** */
 
 .conv {
-    width: 90%;
+    width: 100%;
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    overflow:hidden;
     overflow-y: scroll;
     height: 540px;
 }
