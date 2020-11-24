@@ -1,4 +1,4 @@
-import { HttpMethod, WebsocketRouter } from "../http/Router.ts";
+import { WebsocketRouter, HTTP_METHODS } from "../http/Router.ts";
 
 export const Websocket = (route: string = '') => (target: {} | any) => {
 	WebsocketRouter._groupUrls.set(target.name, route);
@@ -6,7 +6,7 @@ export const Websocket = (route: string = '') => (target: {} | any) => {
 
 export const WSInit = (target: {} | any, propertyKey: PropertyKey) => {
 	WebsocketRouter._routes.push({
-		httpMethod: HttpMethod.GET,
+		httpMethod: HTTP_METHODS.GET,
 		route: '',
 		callback: propertyKey,
 		target

@@ -1,10 +1,5 @@
-import { EventType, WebSocketClient } from "./websocket/lib/WebSocketClient.ts";
-
-enum ALERT_TYPE {
-	ERROR = 'error',
-	WARNING = 'warn',
-	SUCCESS = 'success'
-}
+import { WebSocketClient } from "./websocket/lib/WebSocketClient.ts";
+import { ALERT_TYPE, CHANNELS, INTERLOCUTOR_STATES, EVENTS } from "../../lib/common/mod.ts";
 
 /**
  * @param {string} message message de l'alerte
@@ -36,19 +31,6 @@ function hide_alert() {
 }
 
 let custom_closed = false;
-
-enum CHANNELS {
-	NEW_CONNEXION = 'new_connexion',
-	DISCONNECT = 'disconnect',
-	ALREADY_CONNECTED = 'already_connected',
-	MESSAGE = 'message',
-	IS_WRITTEN = 'is_written'
-}
-
-enum INTERLOCUTOR_STATES {
-	ONLINE = 'Active Now',
-	OFFLINE = 'Inactive Now'
-}
 
 const createMessage = (message: string, date: Date, is_me: boolean) => `
 	<div class="talk ${is_me ? 'right' : 'left'}">
@@ -142,12 +124,12 @@ if (login_form) {
 				(window.location.protocol === 'https:'),
 				'/messages'
 			);
-			ws.on(EventType.ERROR, (e: any) => {
+			ws.on(EVENTS.ERROR, (e: any) => {
 				show_alert(e.error.message, ALERT_TYPE.ERROR);
 
 				console.error('error', e.error);
 			})
-			ws.on(EventType.CLOSE, (e: any) => {
+			ws.on(EVENTS.CLOSE, (e: any) => {
 				show_alert('Vous avez été déconnecté', ALERT_TYPE.WARNING);
 
 				if (custom_closed) {
@@ -160,7 +142,7 @@ if (login_form) {
 
 				console.warn('close', e.event);
 			})
-			ws.on(EventType.OPEN, (e: any) => {
+			ws.on(EVENTS.OPEN, (e: any) => {
 				ws.send_channel('new_connexion', { user: { name: myName.value } });
 			});
 

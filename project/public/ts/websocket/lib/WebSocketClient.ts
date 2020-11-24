@@ -1,21 +1,10 @@
-export enum EventType {
-	OPEN = 'open',
-	CLOSE = 'close',
-	ERROR = 'error',
-	MESSAGE = 'message'
-}
+import { EVENTS, MESSAGE_TYPE } from "../../../../lib/common/mod.ts";
 
-export enum MessageType {
-	TEXT = 'text',
-	JSON = 'json',
-	BUFFER = 'buffer'
-}
-
-type Listeners = Map<EventType, Function | Map<MessageType, Function>>;
+type Listeners = Map<EVENTS, Function | Map<MESSAGE_TYPE, Function>>;
 
 export class WebSocketClient {
 	private readonly socket?: WebSocket;
-	private listeners: Listeners = new Map<EventType, Function | Map<MessageType, Function>>();
+	private listeners: Listeners = new Map<EVENTS, Function | Map<MESSAGE_TYPE, Function>>();
 	private channel_listeners: Map<string, Function> = new Map<string, Function>();
 
 	constructor(
@@ -27,13 +16,13 @@ export class WebSocketClient {
 		this.socket = new WebSocket(`${this.secure ? 'wss' : 'ws'}://${this.hostname}${this.port ? `:${this.port}` : ''}${this.route}`);
 	}
 
-	public on(eventName: EventType, event: Function, messageType: MessageType = MessageType.TEXT): WebSocketClient {
-		if (eventName === EventType.MESSAGE) {
+	public on(eventName: EVENTS, event: Function, messageType: MESSAGE_TYPE = MESSAGE_TYPE.TEXT): WebSocketClient {
+		if (eventName === EVENTS.MESSAGE) {
 			if (this.listeners.has(eventName)) {
 				// @ts-ignore
 				this.listeners.get(eventName).set(messageType, event);
 			} else {
-				const map = new Map<MessageType, Function>();
+				const map = new Map<MESSAGE_TYPE, Function>();
 				map.set(messageType, event);
 				this.listeners.set(eventName, map);
 			}
@@ -48,15 +37,15 @@ export class WebSocketClient {
 		return this;
 	}
 
-	private dispatch(eventName: EventType, params: Record<string, any>, messageType?: MessageType) {
+	private dispatch(eventName: EVENTS, params: Record<string, any>, messageType?: MESSAGE_TYPE) {
 		if (this.listeners.has(eventName)) {
-			const func: Function | Map<MessageType, Function> | undefined = this.listeners.get(eventName);
+			const func: Function | Map<MESSAGE_TYPE, Function> | undefined = this.listeners.get(eventName);
 
 			if (func) {
 				if (typeof func === "function") {
 					func(params);
 				}
-				else if (eventName === EventType.MESSAGE
+				else if (eventName === EVENTS.MESSAGE
 					&& func instanceof Map
 					&& messageType && func.has(messageType)) {
 					const sub_func: Function | undefined = func.get(messageType);
@@ -71,13 +60,13 @@ export class WebSocketClient {
 
 	public listen() {
 		if (this.socket) {
-			this.socket.addEventListener(EventType.OPEN, (e: any) => {
-				this.dispatch(EventType.OPEN, { event: e });
+			this.socket.addEventListener(EVENTS.OPEN, (e: any) => {
+				this.dispatch(EVENTS.OPEN, { event: e });
 			});
-			this.socket.addEventListener(EventType.CLOSE, (e: any) => {
-				this.dispatch(EventType.CLOSE, { event: e });
+			this.socket.addEventListener(EVENTS.CLOSE, (e: any) => {
+				this.dispatch(EVENTS.CLOSE, { event: e });
 			});
-			this.socket.addEventListener(EventType.MESSAGE, async (e: any) => {
+			this.socket.addEventListener(EVENTS.MESSAGE, async (e: any) => {
 				switch(typeof e.data) {
 					case 'string':
 						try {
@@ -88,25 +77,25 @@ export class WebSocketClient {
 								const func = this.channel_listeners.get(channel);
 								if (func) func(json)
 							} else {
-								this.dispatch(EventType.MESSAGE, { event: e, message: json }, MessageType.JSON);
+								this.dispatch(EVENTS.MESSAGE, { event: e, message: json }, MESSAGE_TYPE.JSON);
 							}
 						} catch (err) {
-							this.dispatch(EventType.MESSAGE, { event: e, message: e.data }, MessageType.TEXT);
+							this.dispatch(EVENTS.MESSAGE, { event: e, message: e.data }, MESSAGE_TYPE.TEXT);
 						}
 						break;
 					case 'object':
 						const ab = await e.data.arrayBuffer();
 						// console.log(new Uint8Array(ab));
 						this.dispatch(
-							EventType.MESSAGE,
+							EVENTS.MESSAGE,
 							{ event: e, message: new Uint8Array(ab) },
-							MessageType.BUFFER
+							MESSAGE_TYPE.BUFFER
 						);
 						break;
 				}
 			});
-			this.socket.addEventListener(EventType.ERROR, (e: any) => {
-				this.dispatch(EventType.ERROR, { error: e });
+			this.socket.addEventListener(EVENTS.ERROR, (e: any) => {
+				this.dispatch(EVENTS.ERROR, { error: e });
 			});
 		}
 	}

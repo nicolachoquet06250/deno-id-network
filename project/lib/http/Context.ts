@@ -1,4 +1,5 @@
 import { WebSocket } from "../middlewares/websocket/mod.ts";
+import { CHANNELS } from "../common/mod.ts";
 
 export class Context {
 	protected headers?: Headers;
@@ -99,7 +100,7 @@ export class WSContext extends Context {
 					ws.send(JSON.stringify(message));
 				}
 			},
-			send_channel(channel: string, message: Record<string, any>|string) {
+			send_channel(channel: CHANNELS, message: Record<string, any>|string) {
 				let _message;
 				if (typeof message === "string") {
 					_message = { channel, message };
@@ -127,7 +128,7 @@ export class WSContext extends Context {
 					});
 				}
 			},
-			send_channel(channel: string, message: Record<string, any>|string) {
+			send_channel(channel: CHANNELS, message: Record<string, any>|string) {
 				let _message;
 				if (typeof message === "string") {
 					_message = { channel, message };

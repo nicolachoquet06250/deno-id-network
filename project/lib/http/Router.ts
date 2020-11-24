@@ -2,16 +2,12 @@ import { Router } from "https://deno.land/x/oak/mod.ts";
 import { DependencyInjection } from "../dis/DependencyInjection.ts";
 import { upload } from "../middlewares/upload/mod.ts";
 import { Context } from "./mod.ts";
+import { HTTP_METHODS } from "../common/mod.ts";
 
-export enum HttpMethod {
-	GET = 'get',
-	POST = 'post',
-	PUT = 'put',
-	DELETE = 'delete',
-}
+export { HTTP_METHODS };
 
 export interface Route {
-	httpMethod: HttpMethod
+	httpMethod: HTTP_METHODS
 	route: string
 	callback: Function | any,
 	target: any,
@@ -78,14 +74,14 @@ export class CustomRouter {
 		for (let route of CustomRouter._routes) {
 			let httpMethod: string;
 			switch (route.httpMethod) {
-				case HttpMethod.GET:
-				case HttpMethod.POST:
-				case HttpMethod.PUT:
-				case HttpMethod.DELETE:
+				case HTTP_METHODS.GET:
+				case HTTP_METHODS.POST:
+				case HTTP_METHODS.PUT:
+				case HTTP_METHODS.DELETE:
 					httpMethod = route.httpMethod;
 					break;
 				default:
-					httpMethod = HttpMethod.GET;
+					httpMethod = HTTP_METHODS.GET;
 					break;
 			}
 			let methodToCall: Function;

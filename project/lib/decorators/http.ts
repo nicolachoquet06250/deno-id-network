@@ -1,14 +1,8 @@
-import { CustomRouter, HttpMethod } from "../http/mod.ts";
+import { CustomRouter } from "../http/mod.ts";
 
-export function getParams(func: Function) {
-	const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
-	const ARGUMENT_NAMES = /([^\s,]+)/g;
+import { getParams, HTTP_METHODS } from "../common/mod.ts";
 
-	let fnStr = func.toString().replace(STRIP_COMMENTS, '');
-	let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
-	if(result === null) result = [];
-	return result;
-}
+export { getParams, HTTP_METHODS };
 
 /*******************************************************************************/
 /* Paramétrage du type de classe ***********************************************/
@@ -26,7 +20,7 @@ export const Controller = (route: string = '') =>
 export const Get = (route: string = '/', name?: string) =>
 	(target: {} | any, propertyKey: PropertyKey) => {
 		CustomRouter._routes.push({
-			httpMethod: HttpMethod.GET,
+			httpMethod: HTTP_METHODS.GET,
 			route: route,
 			callback: propertyKey,
 			target,
@@ -37,7 +31,7 @@ export const Get = (route: string = '/', name?: string) =>
 export const Post = (route: string = '/', name?: string) =>
 	(target: {} | any, propertyKey: PropertyKey) => {
 		CustomRouter._routes.push({
-			httpMethod: HttpMethod.POST,
+			httpMethod: HTTP_METHODS.POST,
 			route: route,
 			callback: propertyKey,
 			target,
@@ -48,7 +42,7 @@ export const Post = (route: string = '/', name?: string) =>
 export const Delete = (route: string = '/', name?: string) =>
 	(target: {} | any, propertyKey: PropertyKey) => {
 		CustomRouter._routes.push({
-			httpMethod: HttpMethod.DELETE,
+			httpMethod: HTTP_METHODS.DELETE,
 			route: route,
 			callback: propertyKey,
 			target,
@@ -59,7 +53,7 @@ export const Delete = (route: string = '/', name?: string) =>
 export const Put = (route: string = '/', name?: string) =>
 	(target: {} | any, propertyKey: PropertyKey) => {
 		CustomRouter._routes.push({
-			httpMethod: HttpMethod.PUT,
+			httpMethod: HTTP_METHODS.PUT,
 			route: route,
 			callback: propertyKey,
 			target,
