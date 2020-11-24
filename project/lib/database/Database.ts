@@ -7,13 +7,16 @@ export class Database {
 	private static _connexion?: Promise<Client>;
 	public static get connection(): Promise<Client> {
 		// @ts-ignore
-		const { DB_HOSTNAME, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = Deno.env.toObject();
+		const { DB_HOSTNAME, DB_USERNAME, DB_PASSWORD, DB_DATABASE, DB_PORT } = Deno.env.toObject();
+		const port = DB_PORT ? parseInt(DB_PORT) : 3306;
+
 		if (!this._connexion) {
 			this._connexion = new Client().connect({
 				hostname: DB_HOSTNAME,
 				username: DB_USERNAME,
 				password: DB_PASSWORD,
-				db: DB_DATABASE
+				db: DB_DATABASE,
+				port
 			});
 		}
 		return this._connexion;

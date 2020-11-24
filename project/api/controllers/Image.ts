@@ -67,7 +67,7 @@ export class Image {
 				} else {
 					if (this.router) {
 						// @ts-ignore
-						const {DOMAIN} = Deno.env.toObject();
+						const { DOMAIN } = Deno.env.toObject();
 
 						this.context.set_status(404).respond({
 							status: 'error',
@@ -102,7 +102,7 @@ export class Image {
 			} else {
 				if (this.router) {
 					// @ts-ignore
-					const {DOMAIN} = Deno.env.toObject();
+					const { DOMAIN } = Deno.env.toObject();
 
 					this.context.set_status(404).respond({
 						status: 'error',

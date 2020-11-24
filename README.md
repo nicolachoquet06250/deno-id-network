@@ -28,6 +28,27 @@
      
            docker-compose build
            docker-compose up <container-name>
+       
+   - #### VARIABLES D'ENVIRONNEMENT
+     - #####REQUISES
+       - IP: string
+       - PORT: number
+       - DOMAIN: string
+       - SECURE: boolean
+       - DB_HOSTNAME: string
+       - DB_USERNAME: string
+       - DB_PASSWORD: string
+       - DB_DATABASE: string
+
+     - ##### FACULTATIVES
+       - DB_PORT: number
+       - SMTP_TLS: boolean
+       - SMTP_HOSTNAME: string
+       - SMTP_PORT: number
+       - SMTP_USERNAME: string
+       - SMTP_PASSWORD: string
+    
+    
 
 ## ANNEXES
 
